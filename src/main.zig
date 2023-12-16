@@ -1,7 +1,7 @@
 const std = @import("std");
 const net = std.net;
 
-pub fn handleConnection(conn: net.StreamServer.Connection, stdout: std.io.Writer) !void {
+pub fn handleConnection(conn: net.StreamServer.Connection, stdout: std.fs.File.Writer) !void {
     defer conn.stream.close();
 
     var buf: [300]u8 = undefined;
