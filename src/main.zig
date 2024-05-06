@@ -1,7 +1,7 @@
 const std = @import("std");
 const net = std.net;
 
-pub fn handleConnection(conn: net.StreamServer.Connection, stdout: std.fs.File.Writer) !void {
+pub fn handleConnection(conn: net.Server.Connection, stdout: std.fs.File.Writer) !void {
     defer conn.stream.close();
 
     var buf: [300]u8 = undefined;
@@ -31,17 +31,13 @@ pub fn handleConnection(conn: net.StreamServer.Connection, stdout: std.fs.File.W
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
 
-    var server = net.StreamServer.init(.{
+    const address = try net.Address.resolveIp("0.0.0.0", 3000);
+    var server = try address.listen(.{
         .reuse_port = true,
         .reuse_address = true,
     });
-    defer {
-        server.close();
-        server.deinit();
-    }
+    defer server.deinit();
 
-    const address = try net.Address.resolveIp("0.0.0.0", 3000);
-    try server.listen(address);
     try stdout.print("[INFO] Server listening on {}\n", .{server.listen_address});
 
     while (true) {
